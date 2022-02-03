@@ -1,0 +1,202 @@
+{'category': 'General Knowledge', 'type': 'multiple', 'difficulty': 'hard', 'question': 'What is the airspeed velocity of an unladen swallow?', 'correct_answer': '24 MPH', 'incorrect_answers': ['15 MPH', '20 MPH', '200 MPH']}
+{'category': 'General Knowledge', 'type': 'multiple', 'difficulty': 'medium', 'question': 'What does the &quot;G&quot; mean in &quot;G-Man&quot;?', 'correct_answer': 'Government', 'incorrect_answers': ['Going', 'Ghost', 'Geronimo']}
+{'category': 'General Knowledge', 'type': 'multiple', 'difficulty': 'hard', 'question': 'Which film star has his statue in Leicester Square?', 'correct_answer': 'Charlie Chaplin', 'incorrect_answers': ['Paul Newman', 'Rowan Atkinson ', 'Alfred Hitchcock']}
+{'category': 'General Knowledge', 'type': 'boolean', 'difficulty': 'easy', 'question': 'A scientific study on peanuts in bars found traces of over 100 unique specimens of urine.', 'correct_answer': 'False', 'incorrect_answers': ['True']}
+{'category': 'General Knowledge', 'type': 'multiple', 'difficulty': 'hard', 'question': 'What year was the RoboSapien toy robot released?', 'correct_answer': '2004', 'incorrect_answers': ['2000', '2001', '2006']}
+{'category': 'General Knowledge', 'type': 'multiple', 'difficulty': 'hard', 'question': 'According to Fair Works Australia, how long do you have to work to get Long Service Leave?', 'correct_answer': '7 years', 'incorrect_answers': ['2 years', '8 years', '6 months']}
+{'category': 'General Knowledge', 'type': 'multiple', 'difficulty': 'easy', 'question': 'Which country, not including Japan, has the most people of japanese decent?', 'correct_answer': 'Brazil', 'incorrect_answers': ['China', 'South Korea', 'United States of America']}
+{'category': 'General Knowledge', 'type': 'multiple', 'difficulty': 'easy', 'question': 'In which fast food chain can you order a Jamocha Shake?', 'correct_answer': 'Arby&#039;s', 'incorrect_answers': ['McDonald&#039;s', 'Burger King', 'Wendy&#039;s']}
+{'category': 'General Knowledge', 'type': 'boolean', 'difficulty': 'easy', 'question': 'The mitochondria is the powerhouse of the cell.', 'correct_answer': 'True', 'incorrect_answers': ['False']}
+{'category': 'General Knowledge', 'type': 'multiple', 'difficulty': 'easy', 'question': 'In aerodynamics, which force pushes an object upwards?', 'correct_answer': 'Lift', 'incorrect_answers': ['Drag', 'Weight', 'Thrust']}
+
+URL Format = '&category=23https://opentdb.com/api.php?amount=10&difficulty=easy&type=boolean'
+
+
+
+{'category': 'Entertainment: Film', 'type': 'multiple', 'difficulty': 'medium', 'question': 'This movie contains the quote, &quot;What we&#039;ve got here is a failure to communicate.&quot;', 'correct_answer': 'Cool Hand Luke', 'incorrect_answers': ['Bonnie and Clyde', 'The Graduate', 'In the Heat of the Night']}
+{'category': 'Entertainment: Video Games', 'type': 'multiple', 'difficulty': 'hard', 'question': 'In &quot;Sonic the Hedgehog 2&quot; for the Sega Genesis, what do you input in the sound test screen to access the secret level select?', 'correct_answer': 'The Lead Programmer&#039;s birthday', 'incorrect_answers': ['The first release date of &quot;Sonic the Hedgehog&quot;', 'The date Sonic Team was founded', 'The first release date of &quot;Sonic the Hedgehog 2&quot;']}
+{'category': 'Entertainment: Music', 'type': 'multiple', 'difficulty': 'easy', 'question': 'Which Twitch streamer is the vocalist for Red Vox?', 'correct_answer': 'Vinesauce', 'incorrect_answers': ['The8BitDrummer', 'LIRIK', 'Sodapoppin']}
+{'category': 'Geography', 'type': 'multiple', 'difficulty': 'medium', 'question': 'Where are the Nazca Lines located?', 'correct_answer': 'Peru', 'incorrect_answers': ['Brazil', 'Colombia', 'Ecuador']}
+{'category': 'Geography', 'type': 'boolean', 'difficulty': 'medium', 'question': 'Gothenburg is the capital of Sweden.', 'correct_answer': 'False', 'incorrect_answers': ['True']}
+{'category': 'Science & Nature', 'type': 'boolean', 'difficulty': 'easy', 'question': 'An exothermic reaction is a chemical reaction that releases energy by radiating electricity.', 'correct_answer': 'False', 'incorrect_answers': ['True']}
+{'category': 'Entertainment: Video Games', 'type': 'boolean', 'difficulty': 'easy', 'question': 'Activision created Battlefield 1.', 'correct_answer': 'False', 'incorrect_answers': ['True']}
+{'category': 'Science & Nature', 'type': 'boolean', 'difficulty': 'easy', 'question': 'Psychology is the science of behavior and mind.', 'correct_answer': 'True', 'incorrect_answers': ['False']}
+{'category': 'Entertainment: Film', 'type': 'multiple', 'difficulty': 'medium', 'question': 'Ed Koch, the Mayor of New York in 1984, played himself in which Muppets movie?', 'correct_answer': 'The Muppets Take Manhattan', 'incorrect_answers': ['The Great Muppet Caper', 'The Muppet Christmas Carol', 'The Muppet Movie']}
+{'category': 'Entertainment: Video Games', 'type': 'mu
+
+<class 'discord.message.Message'>
+
+
+
+
+
+Categories:
+1. General Knowledge
+2. Entertainment: Books
+3. Entertainment: Film
+4. Entertainment: Music
+5. Entertainment: Musicals & Theatres
+6. Entertainment: Television
+7. Entertainment: Video Games
+8. Entertainment: Board Games
+9. Science & Nature
+10. Science: Computers
+11. Science: Mathematics
+12. Science: Mythology
+13. Sports
+14. Geography
+15. History
+16. Politics
+17. Art
+18. Celebrities
+19. Animals
+20. Vehicles
+21. Entertainment: comics
+22. Science: Gadgets
+23. Entertainment: Japanese Anime & Manga
+24. Entertainment: Cartoons & Animations
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# trivia_url = f"https://opentdb.com/api.php?amount=10"
+
+# qinput = "$trivia"
+# a = requests.request('POST', trivia_url,json={"query":qinput[1:]} )
+# data = json.loads(a.text)
+# for i in data['results']:
+#     Outputs = i
+# options = []
+# category = Outputs['category']
+# qtype = Outputs['type']
+# question = Outputs['question']
+
+# options.append(Outputs['correct_answer'])
+# for i in Outputs['incorrect_answers']:
+#     options.append(i)
+# options.sort()
+# options.reverse()
+# question = question.replace("&quot;", "\"")
+# question = question.replace("&#039;", "\'")
+# trivia = f' Category: {category}\n Type: {qtype}\n Question:\n {question} \n Options: '
+# op = []
+# await message.channel.send(trivia)
+# for i in range(len(options)):
+#     op.append(temojis[i])
+#     op.append(options[i])
+# inlineop = ""
+# for i in op:
+#     inlineop= inlineop + i + " "
+# await message.channel.send(inlineop)
+# time.sleep(5)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#'''trivia_url = "https://opentdb.com/api.php?amount=10"
+#qinput = "$trivia"
+#a = requests.request('POST', trivia_url,json={"query":qinput[1:]} )
+#data = json.loads(a.text)
+#for i in data['results']:
+    #Outputs = i
+    #options = []
+    #numberofquestions = message.content[7:]
+        #cat = message.content[9:]
+        #if numberofquestions is not None:
+            #f cat is not None:
+                #trivia_url = f"https://opentdb.com/api.php?amount={numberofquestions}&category={cat}"
+            #else:
+                #trivia_url = f"https://opentdb.com/api.php?amount={numberofquestions}"
+        #else:
+    #category = Outputs['category']
+    #qtype = Outputs['type']
+    #question = str(Outputs['question'])
+    #question = question.replace("&quot;", "\"")
+    #question = question.replace("&#039;", "\'")
+    #options.append(Outputs['correct_answer'])
+    #for i in Outputs['incorrect_answers']:
+       #options.append(i)
+    #ptions.sort()
+    #options.reverse()
+    #trivia = f' Category: {category}\n Type: {qtype}\n Question:\n {question} \n Options: '
+    #print(trivia)
+    #for i in range(len(options)):
+        #print(emojis[i], options[i])
+    #print('\n')

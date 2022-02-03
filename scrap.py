@@ -1,5 +1,3 @@
-from optparse import Option
-from sre_parse import CATEGORIES
 import discord
 from os import environ
 import requests
