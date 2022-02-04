@@ -3,7 +3,9 @@ from os import environ
 import requests
 from discord.ext import commands
 import json
-import cog_commands
+import quote_manager
+import asyncio
+from datetime import datetime
 from youtube_dl import YoutubeDL
 
 client = discord.Client()
@@ -76,9 +78,21 @@ async def play_music():
     else:
         is_playing = False
 # cog_commands.send_message(client)
+
+
 @client.event
 async def on_ready():
+    await client.wait_until_ready()
     print('We have logged in as {0.user}'.format(client))
+    while True:
+        time = datetime.now().strftime("%H:%M:%S")
+        if time >= "10:00:00" and time <= "10:10:00":
+            post = quote_manager.quote_time()
+            quoteObj = client.get_channel(int(environ.get("id")))
+            await quoteObj.send(post)
+            await asyncio.sleep((24*60*60)-100)
+        else:
+            await asyncio.sleep(1)
 
 
 # @client.command(name="help")
@@ -88,6 +102,7 @@ async def on_ready():
 @client.command(name="hello")
 async def hello(ctx):
     await ctx.send(greeting_message)
+
 
 @client.command(name="play")
 async def play(ctx, *args):
@@ -105,6 +120,7 @@ async def play(ctx, *args):
         if is_playing == False:
             await play_music()
 
+
 @client.command(name="queue")
 async def queue(ctx):
     music_list_queue = ""
@@ -117,12 +133,14 @@ async def queue(ctx):
     else:
         await ctx.send("Queue is empty!!")
 
+
 @client.command()
 async def pause(ctx):
     if voice.is_playing():
         voice.pause()
     else:
         await ctx.send("Error : Nothing playing!")
+
 
 @client.command()
 async def resume(ctx):
@@ -131,9 +149,11 @@ async def resume(ctx):
     else:
         await ctx.send("The audio is not paused.")
 
+
 @client.command()
 async def stop(ctx):
     await voice.stop()
+
 
 @client.command(name="skip")
 async def skip(ctx):
@@ -141,11 +161,13 @@ async def skip(ctx):
         voice.stop()
         await play_music()
 
+
 @client.command(name="previous")
 async def previous(ctx):
     if voice != "" and voice:
         voice.stop()
         await play_music()
+
 
 @client.command()
 async def disconnect(ctx):
@@ -156,16 +178,18 @@ async def disconnect(ctx):
     else:
         await ctx.send("Error : Bot is already diconnected!!")
 
+
 @client.command()
-async def m(ctx,*message):
+async def m(ctx, *message):
     query = ""
     for word in message:
         query = query + word + " "
     print(query)
-    response = requests.get(f"https://api.simsimi.net/v2/?text={query}&lc=en&cf=[chatfuel]")
+    response = requests.get(
+        f"https://api.simsimi.net/v2/?text={query}&lc=en&cf=[chatfuel]")
     data = json.loads(response.text)
     reply = data['success']
     await ctx.send(reply)
 
-    
+
 client.run(environ.get("bot_token"))
