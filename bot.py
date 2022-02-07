@@ -57,16 +57,31 @@ async def on_message(message):
             id_of_z = await message.channel.fetch_message(z.id)
             users = []
             await asyncio.sleep(5)
-            reactions = id_of_z.reactions.flatten
-            print(reactions)
-            print(type(reactions[0]))
+            reactions = id_of_z.reactions
+            
+            reactions_Dic = {"1️⃣":[],"2️⃣":[],"3️⃣":[],"4️⃣":[]}
+
             for reaction in reactions:
-                print(reaction.count)
                 async for user in reaction.users():
                     users.append(user)
                     print(reaction.emoji)
-            print(users)
-            for i in users:
+            for i in reactions:
+                if i.emoji =="1️⃣":
+                    async for user in i.users():
+                        reactions_Dic["1️⃣"].append(user)
+            for i in reactions:
+                if i.emoji =="2️⃣":
+                    async for user in i.users():
+                        reactions_Dic["2️⃣"].append(user)
+            for i in reactions:
+                if i.emoji =="3️⃣":
+                    async for user in i.users():
+                        reactions_Dic["3️⃣"].append(user)
+            for i in reactions:
+                if i.emoji =="4️⃣":
+                    async for user in i.users():
+                        reactions_Dic["4️⃣"].append(user)
+            for i in reactions_Dic["1️⃣"]:
                 print(i)
             await z.delete()
             remsg = scrap.correctanswer(b)
@@ -81,4 +96,4 @@ async def on_message(message):
             
   
 
-client.run("OTM1ODM5NDQyODMxMjkwNDQ4.YfEeZg.fkOLnpHRF15s0H6L5TD1Y8IHy3I")
+client.run("OTM1ODM5NDQyODMxMjkwNDQ4.YfEeZg.LsXnRYrNd0JZhE9bm5TV3cc5OTo")

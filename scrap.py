@@ -69,6 +69,7 @@ def showquestions(data):
             options.append(j)
         options.sort()
         options.reverse()
+        print(options.index(Outputs[i]['correct_answer']))
         c = []    
         d = []
         for k in range(len(options)):
