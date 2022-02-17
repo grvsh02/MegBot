@@ -14,7 +14,7 @@ client = commands.Bot(command_prefix='!')
 
 is_playing = False
 music_queue = []
-hidden_music_queue = []
+current_track = 0
 YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
 FFMPEG_OPTIONS = {
     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
@@ -50,14 +50,26 @@ def search_yt(item):
     return {'source': info['formats'][0]['url'], 'title': info['title']}
 
 
-def play_next():
-    global is_playing
+async def send_music_info(ctx, embed):
+    print("hello")
+    await ctx.send(embed=embed)
+
+
+def play_next(ctx):
+    global is_playing, current_track
     if len(music_queue) > 0:
         is_playing = True
-        video_source = music_queue[0][0]['source']
-        music_queue.pop(0)
+        print(current_track, len(music_queue))
+        if current_track < len(music_queue) - 1:
+            current_track += 1
+        else:
+            current_track = 0
+        video_source = music_queue[current_track][0]['source']
         voice.play(discord.FFmpegPCMAudio(video_source, **
-                   FFMPEG_OPTIONS), after=lambda e: play_next())
+                   FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
+        embed = discord.Embed(title="Track info",
+                              description=f"**Playing track {current_track + 1}**\n```{music_queue[current_track][0]['title']}```", color=discord.Color.blue())
+        client.loop.create_task(ctx.send(embed=embed))
     else:
         is_playing = False
 
@@ -70,20 +82,19 @@ def play_next():
 #         is_playing = False
 
 
-async def play_music():
+async def play_music(ctx):
     global is_playing, voice
     if len(music_queue) > 0:
         is_playing = True
-        video_source = music_queue[0][0]['source']
+        video_source = music_queue[current_track][0]['source']
 
         if voice == "" or not voice.is_connected() or voice == None:
             voice = await music_queue[0][1].connect()
+            voice.play(discord.FFmpegPCMAudio(video_source, **
+                                              FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
         else:
             await voice.move_to(music_queue[0][1])
-        music_queue.pop(0)
 
-        voice.play(discord.FFmpegPCMAudio(video_source, **
-                   FFMPEG_OPTIONS), after=lambda e: play_next())
     else:
         is_playing = False
 # cog_commands.send_message(client)
@@ -96,7 +107,9 @@ async def q(ctx,*args):
         if time >= "10:00:00" and time <= "10:10:00":
             post = quote_manager.quote_time()
             quoteObj = client.get_channel(int(environ.get("id")))
-            await quoteObj.send(post)
+            embed = discord.Embed(title="Queue info",
+                                  description=f"**{post}**", color=discord.Color.blue())
+            await quoteObj.send(embed=embed)
             await asyncio.sleep((24*60*60)-100)
         else:
             await asyncio.sleep(1)
@@ -120,27 +133,35 @@ async def play(ctx, *args):
     voice_channel = ctx.author.voice.channel
     song = search_yt(query)
     if type(song) == type(True):
-        await ctx.send("Error : Could not find/download the song.")
+        embed = discord.Embed(title="Error info",
+                              description=f"**Error : Could not find/download the song.**", color=discord.Color.blue())
+        await ctx.send(embed=embed)
     else:
-        await ctx.send("Song will be played!!")
         music_queue.append([song, voice_channel])
-        hidden_music_queue.append([song, voice_channel])
-
+        embed = discord.Embed(title="Track info",
+                              description=f"**Added to Queue at Track {len(music_queue)}:**\n```{music_queue[-1][0]['title']}```", color=discord.Color.blue())
+        await ctx.send(embed=embed)
         if is_playing == False:
-            await play_music()
+            await play_music(ctx)
 
 
 @client.command(name="queue")
 async def queue(ctx):
     music_list_queue = ""
     for i in range(0, len(music_queue)):
-        music_list_queue += music_queue[i][0]['title'] + "\n"
-
+        if i == current_track:
+            music_list_queue += "🎶" + music_queue[i][0]['title'] + "\n"
+        else:
+            music_list_queue += "  " + music_queue[i][0]['title'] + "\n"
     print(music_list_queue)
     if music_list_queue != "":
-        await ctx.send(music_list_queue)
+        embed = discord.Embed(title="Queue info",
+                              description=f"```{music_list_queue}```", color=discord.Color.blue())
+        await ctx.send(embed=embed)
     else:
-        await ctx.send("Queue is empty!!")
+        embed = discord.Embed(title="Queue info",
+                              description=f"**Queue is empty!!**", color=discord.Color.blue())
+        await ctx.send(embed=embed)
 
 
 @client.command()
@@ -148,7 +169,9 @@ async def pause(ctx):
     if voice.is_playing():
         voice.pause()
     else:
-        await ctx.send("Error : Nothing playing!")
+        embed = discord.Embed(title="Error info",
+                              description=f"**Error : nothing is playing**", color=discord.Color.blue())
+        await ctx.send(embed=embed)
 
 
 @client.command()
@@ -156,7 +179,9 @@ async def resume(ctx):
     if voice.is_paused():
         voice.resume()
     else:
-        await ctx.send("The audio is not paused.")
+        embed = discord.Embed(title="Error info",
+                              description=f"**The audio is not paused.**", color=discord.Color.blue())
+        await ctx.send(embed=embed)
 
 
 @client.command()
@@ -165,17 +190,21 @@ async def stop(ctx):
 
 
 @client.command(name="skip")
-async def skip(ctx):
-    if voice != "" and voice:
+async def skip(ctx, *args):
+    global current_track
+    if args != () and voice != "" and voice and int(args[0]) > 0 and int(args[0]) <= len(music_queue):
+        current_track = int(args[0]) - 2
         voice.stop()
-        await play_music()
+    elif voice != "" and voice:
+        voice.stop()
 
 
 @client.command(name="previous")
 async def previous(ctx):
+    global current_track
     if voice != "" and voice:
+        current_track -= 2
         voice.stop()
-        await play_music()
 
 
 @client.command()
@@ -185,7 +214,19 @@ async def disconnect(ctx):
         await voice.disconnect()
         music_queue.clear()
     else:
-        await ctx.send("Error : Bot is already diconnected!!")
+        embed = discord.Embed(title="Error info",
+                              description=f"**Error : Bot is already diconnected!!**", color=discord.Color.blue())
+        await ctx.send(embed=embed)
+
+
+@client.command()
+async def remove(ctx, *args):
+    global current_track, music_queue
+    if int(args[0]) > 0 and int(args[0]) <= len(music_queue):
+        embed = discord.Embed(title="Track info",
+                              description=f"**Removed track {args[0]}**\n```{music_queue[int(args[0])-1][0]['title']}```", color=discord.Color.blue())
+        await ctx.send(embed=embed)
+        music_queue.pop(int(args[0]) - 1)
 
 
 @client.command()
