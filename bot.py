@@ -96,7 +96,6 @@ async def play_music(ctx):
                                               FFMPEG_OPTIONS), after=lambda e: play_next(ctx))
         else:
             await voice.move_to(music_queue[0][1])
-
     else:
         is_playing = False
 # cog_commands.send_message(client)
@@ -164,16 +163,24 @@ async def trivia(ctx, *args):
         await ctx.send(sendcrt)
 
 
-@client.event
+@client.command()
 async def q(ctx, *args):
     channel_id = args[0]
+    quoteObj = client.get_channel(int(channel_id))
+    try:
+        embed = discord.Embed(title="Quote Opener",
+                              description=f"```Hello!! From today I will send a daily quote here 😊```", color=discord.Color.blue())
+        await quoteObj.send(embed=embed)
+    except:
+        embed = discord.Embed(title="Error !!!",
+                              description=f"```Please check if the channel ID is correct and I have access to it```", color=discord.Color.blue())
+        await ctx.send(embed=embed)
     while True:
         time = datetime.now().strftime("%H:%M:%S")
         if time >= "10:00:00" and time <= "10:10:00":
             post = quote_manager.quote_time()
-            quoteObj = client.get_channel(int(environ.get("id")))
-            embed = discord.Embed(title="Queue info",
-                                  description=f"**{post}**", color=discord.Color.blue())
+            embed = discord.Embed(title="Quote Time !!!",
+                                  description=f"{post}", color=discord.Color.blue())
             await quoteObj.send(embed=embed)
             await asyncio.sleep((24*60*60)-100)
         else:
