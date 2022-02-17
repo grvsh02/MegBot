@@ -1,3 +1,4 @@
+from socket import timeout
 import discord
 from os import environ
 import requests
@@ -7,6 +8,7 @@ import quote_manager
 import asyncio
 from datetime import datetime
 from youtube_dl import YoutubeDL
+import scrap
 
 client = discord.Client()
 client = commands.Bot(command_prefix='!')
@@ -99,8 +101,71 @@ async def play_music(ctx):
         is_playing = False
 # cog_commands.send_message(client)
 
+
+@client.command()
+async def trivia(ctx, *args):
+    # $trivia 10 13
+
+    n = int(args[0])
+    if len(args) == 1:
+        c = 8
+    else:
+        c = int(args[1]) + 8
+    for i in range(n):
+        b = scrap.getdata(n, c)
+        a = scrap.showquestions(b)
+        rmsg = f"""```{a}```"""
+        z = await ctx.send(rmsg)
+        await z.add_reaction("1️⃣")
+        await z.add_reaction("2️⃣")
+        await z.add_reaction("3️⃣")
+        await z.add_reaction("4️⃣")
+        id_of_z = await ctx.fetch_message(z.id)
+        users = []
+        # await asyncio.sleep(5)
+        reactions = []
+
+        def check(reaction, user):
+            if str(reaction.emoji) == '1️⃣':
+                return str(reaction.emoji) == '1️⃣' and user != client.user
+            if str(reaction.emoji) == '2️⃣':
+                return str(reaction.emoji) == '2️⃣' and user != client.user
+            if str(reaction.emoji) == '3️⃣':
+                return str(reaction.emoji) == '3️⃣' and user != client.user
+            if str(reaction.emoji) == '4️⃣':
+                return str(reaction.emoji) == '4️⃣' and user != client.user
+        answers = {'1️⃣': [], '2️⃣': [], '3️⃣': [], '4️⃣': []}
+        while True:
+            # try:
+            reaction, user = await client.wait_for('reaction_add', timeout=10, check=check)
+            answers[str(reaction.emoji)].append(user.name)
+            print(len(answers['1️⃣']), answers['1️⃣'])
+            if len(answers['1️⃣']) + len(answers['2️⃣']) + len(answers['3️⃣']) + len(answers['4️⃣']) == 4:
+                break
+            print(answers)
+            # except:
+            #     break
+            # for i in range(4):
+            #     reactions.append(id_of_z.reactions[i])
+            # print(reactions)
+            # # print(type(reactions[0]))
+            # for reaction in reactions:
+            #     print(reaction.count)
+            #     async for user in reaction.users():
+            #         users.append(user)
+            #         print(reaction.emoji)
+            # print(users)
+            # for i in users:
+            #     print(i)
+
+        await z.delete()
+        remsg = scrap.correctanswer(b)
+        sendcrt = f"""```{remsg}```"""
+        await ctx.send(sendcrt)
+
+
 @client.event
-async def q(ctx,*args):
+async def q(ctx, *args):
     channel_id = args[0]
     while True:
         time = datetime.now().strftime("%H:%M:%S")
@@ -114,11 +179,11 @@ async def q(ctx,*args):
         else:
             await asyncio.sleep(1)
 
+
 @client.event
 async def on_ready():
     await client.wait_until_ready()
     print('We have logged in as {0.user}'.format(client))
-    
 
 
 # @client.command(name="help")
