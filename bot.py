@@ -19,14 +19,23 @@ YDL_OPTIONS = {'format': 'bestaudio', 'noplaylist': 'True'}
 FFMPEG_OPTIONS = {
     'before_options': '-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5', 'options': '-vn'}
 voice = ""
-greeting_message = "Hey there! I am your new music assistant!!"
-help_message = """
+help_message_music = """
 !help - Shows this message
 !play <song_name> - Plays the song
 !queue - displays the current music queue
 !skip - skips to the next song
+!skip <track no> - skips to the track selected
 !previous - Plays previous played song
 !disconnect - bot leaves from current vc
+!remove <track no> - removes the track from the queue
+!pause - pause the current track
+!resume - resume the current track
+"""
+help_message_chat = """
+!m <ur msg> - replies to almost all questions :)
+"""
+help_message_quote = """
+!q <channel id> - sends a daily quote to a specified channel
 """
 
 
@@ -79,11 +88,9 @@ async def play_music():
         is_playing = False
 # cog_commands.send_message(client)
 
-
 @client.event
-async def on_ready():
-    await client.wait_until_ready()
-    print('We have logged in as {0.user}'.format(client))
+async def q(ctx,*args):
+    channel_id = args[0]
     while True:
         time = datetime.now().strftime("%H:%M:%S")
         if time >= "10:00:00" and time <= "10:10:00":
@@ -94,14 +101,16 @@ async def on_ready():
         else:
             await asyncio.sleep(1)
 
+@client.event
+async def on_ready():
+    await client.wait_until_ready()
+    print('We have logged in as {0.user}'.format(client))
+    
+
 
 # @client.command(name="help")
 # async def help(ctx):
 #         await ctx.send(help_message)
-
-@client.command(name="hello")
-async def hello(ctx):
-    await ctx.send(greeting_message)
 
 
 @client.command(name="play")
