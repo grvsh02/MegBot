@@ -1,12 +1,17 @@
+from ssl import Options
 import discord
 from os import environ
 import requests
 import random
 import json
 import time
+import random
 
 emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣"]
-rightwrong = ["✅", "❌", "❌", "❌"]
+rightwrong = ["✅", "❌"]
+correctAnswer = 0
+options = []
+question = ""
 
 
 def gethelp():
@@ -51,68 +56,43 @@ def getdata(numberofquestions, cat):
 
 
 def showquestions(data):
-    Outputs = []
-    results = data['results']
-    for i in results:
-        Outputs.append(i)
+    global correctAnswer, options, question
+    Outputs = data['results']
     print(Outputs)
-    for i in range(len(Outputs)):
-        options = []
-        category = Outputs[i]['category']
-        qtype = Outputs[i]['type']
-        question = str(Outputs[i]['question'])
-        question = question.replace("&quot;", "\"")
-        question = question.replace("&#039;", "\'")
-        question = question.replace("&lt;", "<")
-        question = question.replace("&gt;", ">")
-        question = question.replace("&le;", "≤")
-        question = question.replace("&ge;", "≥")
-        options.append(Outputs[i]['correct_answer'])
-        for j in Outputs[i]['incorrect_answers']:
-            options.append(j)
-        options.sort()
-        options.reverse()
-        c = []
-        d = []
-        for k in range(len(options)):
-            d.append(emojis[k])
-            c.append(options[k])
-        inlineop = ""
-        for i in range(len(c)):
-            inlineop = inlineop + d[i] + c[i] + "\n "
-        trivia = f"Category:{category} \n Type: {qtype}\n Question:\n {question} \n\n Options:\n {inlineop}"
-        return trivia
+    options = []
+    category = Outputs[0]['category']
+    qtype = Outputs[0]['type']
+    question = str(Outputs[0]['question'])
+    question = question.replace("&quot;", "\"")
+    question = question.replace("&#039;", "\'")
+    question = question.replace("&lt;", "<")
+    question = question.replace("&gt;", ">")
+    question = question.replace("&le;", "≤")
+    question = question.replace("&ge;", "≥")
+    options.append(Outputs[0]['correct_answer'])
+    for j in Outputs[0]['incorrect_answers']:
+        options.append(j)
+    random.shuffle(options)
+    for index, option in enumerate(options):
+        if option == Outputs[0]['correct_answer']:
+            correctAnswer = index
+    inlineop = ""
+    for i in range(len(options)):
+        inlineop = inlineop + emojis[i] + "**" + options[i] + "**" + "\n"
+    trivia = f"**Category:** {category} \n**Type:** {qtype}\n**Question:**\n```{question}```\n**Options:**\n{inlineop}"
+    return trivia
 
 
-def correctanswer(data):
-    Outputs = []
-    results = data['results']
-    for i in results:
-        Outputs.append(i)
-    for i in range(len(Outputs)):
-        options = []
-        question = str(Outputs[i]['question'])
-        question = question.replace("&quot;", "\"")
-        question = question.replace("&#039;", "\'")
-        question = question.replace("&lt;", "<")
-        question = question.replace("&gt;", ">")
-        question = question.replace("&le;", "≤")
-        question = question.replace("&ge;", "≥")
-        question = question.replace("&rsquo;", "\'")
-        question = question.replace("&lsquo;", "\'")
-        options.append(Outputs[i]['correct_answer'])
-        for j in Outputs[i]['incorrect_answers']:
-            options.append(j)
-        c = []
-        d = []
-        for j in range(len(options)):
-            c.append(rightwrong[j])
-            d.append(options[j])
-        inlineop = ""
-        for i in range(len(c)):
-            inlineop = inlineop+c[i]+d[i]+"\n "
-        Correct_Ans = f"Question:\n {question} \n\n Options: \n {inlineop}"
-        return Correct_Ans
+def correctanswer():
+    global correctAnswer, options, question
+    inlineop = ""
+    for i in range(4):
+        if correctAnswer == i:
+            inlineop = inlineop+rightwrong[0]+options[i]+"\n "
+        else:
+            inlineop = inlineop+rightwrong[1]+options[i]+"\n "
+    ans_string = f"**Question:**\n```{question}```\n**Options:**\n{inlineop}"
+    return ans_string, correctAnswer
 
 
 def get_userdata():

@@ -1,4 +1,6 @@
+from multiprocessing.sharedctypes import Value
 from socket import timeout
+from unicodedata import category
 import discord
 from os import environ
 import requests
@@ -104,25 +106,22 @@ async def play_music(ctx):
 @client.command()
 async def trivia(ctx, *args):
     # $trivia 10 13
-
+    leaderBoard = {}
     n = int(args[0])
     if len(args) == 1:
-        c = 8
+        category = 8
     else:
-        c = int(args[1]) + 8
+        category = int(args[1]) + 8
     for i in range(n):
-        b = scrap.getdata(n, c)
-        a = scrap.showquestions(b)
-        rmsg = f"""```{a}```"""
-        z = await ctx.send(rmsg)
+        question_data = scrap.getdata(1, category)
+        question_string = scrap.showquestions(question_data)
+        embed = discord.Embed(title=f"Question {i+1}",
+                              description=question_string, color=discord.Color.blue())
+        z = await ctx.send(embed=embed)
         await z.add_reaction("1️⃣")
         await z.add_reaction("2️⃣")
         await z.add_reaction("3️⃣")
         await z.add_reaction("4️⃣")
-        id_of_z = await ctx.fetch_message(z.id)
-        users = []
-        # await asyncio.sleep(5)
-        reactions = []
 
         def check(reaction, user):
             if str(reaction.emoji) == '1️⃣':
@@ -133,34 +132,39 @@ async def trivia(ctx, *args):
                 return str(reaction.emoji) == '3️⃣' and user != client.user
             if str(reaction.emoji) == '4️⃣':
                 return str(reaction.emoji) == '4️⃣' and user != client.user
-        answers = {'1️⃣': [], '2️⃣': [], '3️⃣': [], '4️⃣': []}
+        answers = {1: [], 2: [], 3: [], 4: []}
         while True:
-            # try:
-            reaction, user = await client.wait_for('reaction_add', timeout=10, check=check)
-            answers[str(reaction.emoji)].append(user.name)
-            print(len(answers['1️⃣']), answers['1️⃣'])
-            if len(answers['1️⃣']) + len(answers['2️⃣']) + len(answers['3️⃣']) + len(answers['4️⃣']) == 4:
+            try:
+                reaction, user = await client.wait_for('reaction_add', timeout=10, check=check)
+                if reaction.emoji == '1️⃣':
+                    reaction = 1
+                elif reaction.emoji == '2️⃣':
+                    reaction = 2
+                elif reaction.emoji == '3️⃣':
+                    reaction = 3
+                elif reaction.emoji == '4️⃣':
+                    reaction = 4
+                answers[reaction].append(user.name)
+                if len(answers[1]) + len(answers[2]) + len(answers[3]) + len(answers[4]) >= 4:
+                    break
+                print(answers)
+            except:
                 break
-            print(answers)
-            # except:
-            #     break
-            # for i in range(4):
-            #     reactions.append(id_of_z.reactions[i])
-            # print(reactions)
-            # # print(type(reactions[0]))
-            # for reaction in reactions:
-            #     print(reaction.count)
-            #     async for user in reaction.users():
-            #         users.append(user)
-            #         print(reaction.emoji)
-            # print(users)
-            # for i in users:
-            #     print(i)
-
         await z.delete()
-        remsg = scrap.correctanswer(b)
-        sendcrt = f"""```{remsg}```"""
-        await ctx.send(sendcrt)
+        answer_string, correctanswer = scrap.correctanswer()
+        for i in answers[correctanswer+1]:
+            leaderBoard.setdefault(i, 0)
+            leaderBoard[i] += 1
+        embed = discord.Embed(title=f"Answer",
+                              description=answer_string, color=discord.Color.blue())
+        await ctx.send(embed=embed)
+    leaderBoard = dict(sorted(leaderBoard.items(), key=lambda item: item[1]))
+    leaderBoard_string = ""
+    for key, value in leaderBoard.items():
+        leaderBoard_string += str(key) + " : " + str(value)
+    embed = discord.Embed(title=f"Leaderboard",
+                          description=leaderBoard_string, color=discord.Color.blue())
+    await ctx.send(embed=embed)
 
 
 @client.command()
