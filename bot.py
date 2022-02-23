@@ -1,6 +1,7 @@
 from multiprocessing.sharedctypes import Value
 from socket import timeout
 from unicodedata import category
+from unittest import result
 import discord
 from os import environ
 import requests
@@ -13,7 +14,7 @@ from youtube_dl import YoutubeDL
 import scrap
 
 client = discord.Client()
-client = commands.Bot(command_prefix='!')
+client = commands.Bot(command_prefix='!', help_command=None)
 
 
 is_playing = False
@@ -41,6 +42,9 @@ help_message_chat = """
 help_message_quote = """
 !q <channel id> - sends a daily quote to a specified channel
 """
+help_message_trivia = '''
+!trivia <number of questions> <category number> - use "!trivia help" for more details
+'''
 
 
 def search_yt(item):
@@ -104,18 +108,34 @@ async def play_music(ctx):
 
 
 @client.command()
+async def help(ctx):
+    embed = discord.Embed(title=f"Help Info",
+                          description=f"**Music commands**\n```{help_message_music}```\n**Chat bot commands**\n```{help_message_chat}```\n**Quote commands**\n```{help_message_quote}```\n**Trivia Game commands**\n```{help_message_trivia}```", color=discord.Color.blue())
+    await ctx.send(embed=embed)
+
+
+@client.command()
 async def trivia(ctx, *args):
     # $trivia 10 13
+    if args[0] == "help":
+        help_msg = scrap.gethelp()
+        embed = discord.Embed(title=f"Trivia Help",
+                              description=f"{help_msg}", color=discord.Color.blue())
+        return await ctx.send(embed=embed)
     leaderBoard = {}
     n = int(args[0])
     if len(args) == 1:
         category = 8
     else:
         category = int(args[1]) + 8
-    for i in range(n):
-        question_data = scrap.getdata(1, category)
-        question_string = scrap.showquestions(question_data)
-        embed = discord.Embed(title=f"Question {i+1}",
+    question_data = scrap.getdata(n, category)
+    question_list = question_data['results']
+    counter = 0
+    for i in question_list:
+        people = []
+        counter += 1
+        question_string = scrap.showquestions(i)
+        embed = discord.Embed(title=f"Question {counter+1}",
                               description=question_string, color=discord.Color.blue())
         z = await ctx.send(embed=embed)
         await z.add_reaction("1️⃣")
@@ -144,30 +164,45 @@ async def trivia(ctx, *args):
                     reaction = 3
                 elif reaction.emoji == '4️⃣':
                     reaction = 4
-                answers[reaction].append(user.name)
-                if len(answers[1]) + len(answers[2]) + len(answers[3]) + len(answers[4]) >= 4:
-                    break
+                if user.name not in people:
+                    answers[reaction].append(user.name)
+                    people.append(user.name)
                 print(answers)
             except:
                 break
         await z.delete()
+        for j in people:
+            leaderBoard.setdefault(j, 0)
         answer_string, correctanswer = scrap.correctanswer()
         for i in answers[correctanswer+1]:
-            leaderBoard.setdefault(i, 0)
             leaderBoard[i] += 1
         embed = discord.Embed(title=f"Answer",
                               description=answer_string, color=discord.Color.blue())
         await ctx.send(embed=embed)
-    leaderBoard = dict(sorted(leaderBoard.items(), key=lambda item: item[1]))
+    leaderBoard = dict(
+        reversed(sorted(leaderBoard.items(), key=lambda item: item[1])))
     leaderBoard_string = ""
+    flag = 0
+    print(leaderBoard)
     for key, value in leaderBoard.items():
-        leaderBoard_string += str(key) + " : " + str(value)
+        if flag == 0:
+            leaderBoard_string += "🥇" + str(key) + " : " + str(value) + "\n"
+            flag += 1
+        elif flag == 1:
+            leaderBoard_string += "🥈" + str(key) + " : " + str(value) + "\n"
+            flag += 1
+        elif flag == 2:
+            leaderBoard_string += "🥉" + str(key) + " : " + str(value) + "\n"
+            flag += 1
+        else:
+            leaderBoard_string += "  " + str(key) + " : " + str(value) + "\n"
+
     embed = discord.Embed(title=f"Leaderboard",
                           description=leaderBoard_string, color=discord.Color.blue())
     await ctx.send(embed=embed)
 
 
-@client.command()
+@ client.command()
 async def q(ctx, *args):
     channel_id = args[0]
     quoteObj = client.get_channel(int(channel_id))
@@ -191,7 +226,7 @@ async def q(ctx, *args):
             await asyncio.sleep(1)
 
 
-@client.event
+@ client.event
 async def on_ready():
     await client.wait_until_ready()
     print('We have logged in as {0.user}'.format(client))
@@ -202,11 +237,14 @@ async def on_ready():
 #         await ctx.send(help_message)
 
 
-@client.command(name="play")
+@ client.command(name="play")
 async def play(ctx, *args):
     query = " ".join(args)
-
     voice_channel = ctx.author.voice.channel
+    if voice_channel is None:
+        embed = discord.Embed(title="Error info",
+                              description=f"**Error : Please connect to a voice channel**", color=discord.Color.blue())
+        return await ctx.send(embed=embed)
     song = search_yt(query)
     if type(song) == type(True):
         embed = discord.Embed(title="Error info",
@@ -221,7 +259,7 @@ async def play(ctx, *args):
             await play_music(ctx)
 
 
-@client.command(name="queue")
+@ client.command(name="queue")
 async def queue(ctx):
     music_list_queue = ""
     for i in range(0, len(music_queue)):
@@ -240,7 +278,7 @@ async def queue(ctx):
         await ctx.send(embed=embed)
 
 
-@client.command()
+@ client.command()
 async def pause(ctx):
     if voice.is_playing():
         voice.pause()
@@ -250,7 +288,7 @@ async def pause(ctx):
         await ctx.send(embed=embed)
 
 
-@client.command()
+@ client.command()
 async def resume(ctx):
     if voice.is_paused():
         voice.resume()
@@ -260,12 +298,12 @@ async def resume(ctx):
         await ctx.send(embed=embed)
 
 
-@client.command()
+@ client.command()
 async def stop(ctx):
     await voice.stop()
 
 
-@client.command(name="skip")
+@ client.command(name="skip")
 async def skip(ctx, *args):
     global current_track
     if args != () and voice != "" and voice and int(args[0]) > 0 and int(args[0]) <= len(music_queue):
@@ -275,7 +313,7 @@ async def skip(ctx, *args):
         voice.stop()
 
 
-@client.command(name="previous")
+@ client.command(name="previous")
 async def previous(ctx):
     global current_track
     if voice != "" and voice:
@@ -283,19 +321,20 @@ async def previous(ctx):
         voice.stop()
 
 
-@client.command()
+@ client.command()
 async def disconnect(ctx):
-    global music_queue
+    global music_queue, current_track
     if voice.is_connected():
         await voice.disconnect()
         music_queue.clear()
+        current_track = 0
     else:
         embed = discord.Embed(title="Error info",
                               description=f"**Error : Bot is already diconnected!!**", color=discord.Color.blue())
         await ctx.send(embed=embed)
 
 
-@client.command()
+@ client.command()
 async def remove(ctx, *args):
     global current_track, music_queue
     if int(args[0]) > 0 and int(args[0]) <= len(music_queue):
@@ -305,7 +344,7 @@ async def remove(ctx, *args):
         music_queue.pop(int(args[0]) - 1)
 
 
-@client.command()
+@ client.command()
 async def m(ctx, *message):
     query = ""
     for word in message:
