@@ -232,8 +232,9 @@ async def on_ready():
 @ client.command(name="play")
 async def play(ctx, *args):
     query = " ".join(args)
-    voice_channel = ctx.author.voice.channel
-    if voice_channel is None:
+    try:
+        voice_channel = ctx.author.voice.channel
+    except:
         embed = discord.Embed(title="Error info",
                               description=f"**Error : Please connect to a voice channel**", color=discord.Color.blue())
         return await ctx.send(embed=embed)
