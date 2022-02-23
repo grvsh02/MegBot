@@ -1,7 +1,3 @@
-from multiprocessing.sharedctypes import Value
-from socket import timeout
-from unicodedata import category
-from unittest import result
 import discord
 from os import environ
 import requests
@@ -59,7 +55,6 @@ def search_yt(item):
 
 
 async def send_music_info(ctx, embed):
-    print("hello")
     await ctx.send(embed=embed)
 
 
@@ -67,7 +62,6 @@ def play_next(ctx):
     global is_playing, current_track
     if len(music_queue) > 0:
         is_playing = True
-        print(current_track, len(music_queue))
         if current_track < len(music_queue) - 1:
             current_track += 1
         else:
@@ -167,7 +161,6 @@ async def trivia(ctx, *args):
                 if user.name not in people:
                     answers[reaction].append(user.name)
                     people.append(user.name)
-                print(answers)
             except:
                 break
         await z.delete()
@@ -183,7 +176,6 @@ async def trivia(ctx, *args):
         reversed(sorted(leaderBoard.items(), key=lambda item: item[1])))
     leaderBoard_string = ""
     flag = 0
-    print(leaderBoard)
     for key, value in leaderBoard.items():
         if flag == 0:
             leaderBoard_string += "🥇" + str(key) + " : " + str(value) + "\n"
@@ -267,7 +259,6 @@ async def queue(ctx):
             music_list_queue += "🎶" + music_queue[i][0]['title'] + "\n"
         else:
             music_list_queue += "  " + music_queue[i][0]['title'] + "\n"
-    print(music_list_queue)
     if music_list_queue != "":
         embed = discord.Embed(title="Queue info",
                               description=f"```{music_list_queue}```", color=discord.Color.blue())
@@ -349,7 +340,6 @@ async def m(ctx, *message):
     query = ""
     for word in message:
         query = query + word + " "
-    print(query)
     response = requests.get(
         f"https://api.simsimi.net/v2/?text={query}&lc=en&cf=[chatfuel]")
     data = json.loads(response.text)

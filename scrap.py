@@ -1,10 +1,6 @@
-from ssl import Options
-import discord
-from os import environ
 import requests
 import random
 import json
-import time
 import random
 
 emojis = ["1️⃣", "2️⃣", "3️⃣", "4️⃣"]
