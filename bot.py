@@ -45,6 +45,26 @@ help_message_contest = '''
 !contest <channel id> <category number> - sends daily coding contests to a specified channel
 '''
 
+future_features = '''
+to do: 
+1. Add personal dm reminders
+2. someway to select the contests and create reminds for them
+3. redo the whole music stuff (somehow avoid downloading the whole music to play it in a channel and rather use plug and play system to play the tracks)
+4. redo the design of quotes 
+5. improve the ai chat bot model
+6. save user playlists to a backend and even make them public for use in the server domain
+7. scrap hacker rank data for contest apis
+8. custom fields for contest data (for eg. hacker earth and maybe whole recruitment competitions like unstop)
+'''
+
+
+@client.command()
+async def log(ctx):
+    embed = discord.Embed(title=f"Info",
+                          description=f"**Upcoming Features**\n```{future_features}```",
+                          color=discord.Color.blue())
+    await ctx.send(embed=embed)
+
 
 def search_yt(item):
     with YoutubeDL(YDL_OPTIONS) as ydl:
