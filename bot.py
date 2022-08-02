@@ -220,8 +220,7 @@ async def contest(ctx, *args):
 
     while True:
         time = datetime.now().strftime("%H:%M:%S")
-        # if "12:00:00" <= time <= "12:10:00":
-        if 2>1:
+        if "12:00:00" <= time <= "12:10:00":
             post = contest_manager.get_contest(ctx, "codeforces.com", "CodeForces", "codeforces_com")
             await contestObj.send(embed=post)
             post = contest_manager.get_contest(ctx, "leetcode.com", "Leetcode", "leetcode_com")
@@ -249,8 +248,7 @@ async def q(ctx, *args):
         await ctx.send(embed=embed)
     while True:
         time = datetime.now().strftime("%H:%M:%S")
-        # if time >= "10:00:00" and time <= "10:10:00":
-        if 2>1:
+        if time >= "10:00:00" and time <= "10:10:00":
             post = quote_manager.quote_time()
             embed = discord.Embed(title="Quote Time !!!",
                                   description=f"{post}", color=discord.Color.blue())
