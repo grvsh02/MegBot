@@ -1,7 +1,7 @@
 import discord
 from os import environ
 import requests
-from discord.ext import commands
+from discord.ext import tasks, commands
 import json
 import quote_manager
 import contest_manager
@@ -12,6 +12,8 @@ import scrap
 
 client = discord.Client()
 client = commands.Bot(command_prefix='!', help_command=None)
+contestObj = ""
+quoteObj = ""
 
 is_playing = False
 music_queue = []
@@ -225,6 +227,7 @@ async def trivia(ctx, *args):
 
 @client.command()
 async def contest(ctx, *args):
+    global contestObj
     channel_id = args[0]
     contestObj = client.get_channel(int(channel_id))
     try:
@@ -232,28 +235,28 @@ async def contest(ctx, *args):
                               description=f"```Hello!! From today I will remind you about the contests here```",
                               color=discord.Color.blue())
         await contestObj.send(embed=embed)
+        contest_alert.start(ctx)
     except:
         embed = discord.Embed(title="Error !!!",
                               description=f"```Please check if the channel ID is correct and I have access to it```",
                               color=discord.Color.blue())
         await ctx.send(embed=embed)
 
-    while True:
-        time = datetime.now().strftime("%H:%M:%S")
-        if "12:00:00" <= time <= "12:10:00":
-            post = contest_manager.get_contest(ctx, "codeforces.com", "CodeForces", "codeforces_com")
-            await contestObj.send(embed=post)
-            post = contest_manager.get_contest(ctx, "leetcode.com", "Leetcode", "leetcode_com")
-            await contestObj.send(embed=post)
-            post = contest_manager.get_contest(ctx, "codechef.com", "CodeChef", "codechef_com")
-            await contestObj.send(embed=post)
-            await asyncio.sleep((24 * 60 * 60) - 100)
-        else:
-            await asyncio.sleep(1)
+
+@tasks.loop(hours=24)
+async def contest_alert(ctx, *args):
+    global contestObj
+    post = contest_manager.get_contest(ctx, "codeforces.com", "CodeForces", "codeforces_com")
+    await contestObj.send(embed=post)
+    post = contest_manager.get_contest(ctx, "leetcode.com", "Leetcode", "leetcode_com")
+    await contestObj.send(embed=post)
+    post = contest_manager.get_contest(ctx, "codechef.com", "CodeChef", "codechef_com")
+    await contestObj.send(embed=post)
 
 
 @client.command()
 async def q(ctx, *args):
+    global quoteObj
     channel_id = args[0]
     quoteObj = client.get_channel(int(channel_id))
     try:
@@ -261,21 +264,21 @@ async def q(ctx, *args):
                               description=f"```Hello!! From today I will send a daily quote here 😊```",
                               color=discord.Color.blue())
         await quoteObj.send(embed=embed)
+        quote_alert.start(ctx)
     except:
         embed = discord.Embed(title="Error !!!",
                               description=f"```Please check if the channel ID is correct and I have access to it```",
                               color=discord.Color.blue())
         await ctx.send(embed=embed)
-    while True:
-        time = datetime.now().strftime("%H:%M:%S")
-        if time >= "10:00:00" and time <= "10:10:00":
-            post = quote_manager.quote_time()
-            embed = discord.Embed(title="Quote Time !!!",
-                                  description=f"{post}", color=discord.Color.blue())
-            await quoteObj.send(embed=embed)
-            await asyncio.sleep((24 * 60 * 60) - 100)
-        else:
-            await asyncio.sleep(1)
+
+
+@tasks.loop(hours=24)
+async def quote_alert(ctx, *args):
+    global quoteObj
+    post = quote_manager.quote_time()
+    embed = discord.Embed(title="Quote Time !!!",
+                          description=f"{post}", color=discord.Color.blue())
+    await quoteObj.send(embed=embed)
 
 
 @client.event
